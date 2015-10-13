@@ -30,14 +30,14 @@ io.on('connection', function (socket){
 
 	//handle join
 	socket.on('join', function (name){
-		people[socket.id] = name;
+		socket.nickname = name;
 		socket.broadcast.emit('chat message', "User "+ name +" connected");
 	});
 
 	//handle chat message
 	socket.on('chat message', function (msg){
 		console.log('message: ' + msg);
-		io.emit('chat message', msg);
+		socket.broadcast.emit('chat message',socket.nickname+' '+ msg);
 	});	
 });
 
