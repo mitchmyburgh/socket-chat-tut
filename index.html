@@ -16,22 +16,47 @@
   <body>
     <ul id="messages"></ul>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+      <input id="m" autocomplete="off"  onkeydown="onKeyDownNotEnter()"/><button>Send</button>
     </form>
+	<ul id='online'></ul>
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script>
 		var socket = io();
 		socket.emit('join', "name");
 		$('form').submit(function () {
-			socket.emit('chat message', $('#m').val());
-			$('#messages').append($('<li>').text($("#m").val()));
+			//get commands
+			if ($('#m').val().split(" ")[0] === "/n"){ //change username
+				socket.emit('change username', $('#m').val().split(" ")[1])
+			}else if ($('#m').val().split(' ')[0] === "/m"){
+				socket.emit('private message', {name: $('#m').val().split(' ')[1], message: $('#m').val().split(' ')[2]});
+			} else { //standard message
+				socket.emit('chat message', $('#m').val());
+				$('#messages').append($('<li>').text($("#m").val()));
+			}
 			$('#m').val('');
 			return false;
+		});
+		socket.on('private message', function (msg){
+			$('#messages').append($('<li>').text(msg));
 		});
 		socket.on('chat message', function (msg){
 			$('#messages').append($('<li>').text(msg));
 		});
+		socket.on('typing', function (msg){
+			$('#messages').append($('<li>').text(msg));
+		});
+		socket.on('online users', function (msg){
+			$('#online').append($('<li>').text(msg));
+		});
+		function typing () {
+			//socket.emit('typing', 'stopped typing');
+		}
+		function onKeyDownNotEnter (){
+			clearTimeout(this.typingtimeout);
+			//socket.emit('typing', 'is typing');
+			this.typingtimeout = setTimeout(typing, 5000);
+		}
 	</script>
   </body>
 </html>
