@@ -23,7 +23,7 @@ io.on('connection', function (socket){
 	//handle disconnect
 	socket.on('disconnect', function () {
 		console.log('user disconnected');
-		
+		//console.log(JSON.stringify(io.sockets));
 		//broadcast on disconnect
 		io.emit('chat message', 'User disconnected');
 	});
@@ -31,7 +31,7 @@ io.on('connection', function (socket){
 	//handle join
 	socket.on('join', function (name){
 		people[socket.id] = name;
-		io.sockets.emit('chat message', "User "+ name +" connected");
+		socket.broadcast.emit('chat message', "User "+ name +" connected");
 	});
 
 	//handle chat message
